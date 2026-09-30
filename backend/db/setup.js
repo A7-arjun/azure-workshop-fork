@@ -12,12 +12,36 @@ dotenv.config()
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const schemaSql = readFileSync(path.join(__dirname, 'schema.sql'), 'utf8')
 
-const baseConfig = {
-  host: process.env.PGHOST || 'localhost',
-  port: Number(process.env.PGPORT || 5432),
-  user: process.env.PGUSER || undefined, // falls back to OS username
-  password: process.env.PGPASSWORD || undefined,
+// Managed Postgres (Azure Database for PostgreSQL, RDS, etc.) enforces SSL.
+// Detect it from the connection string rather than assuming localhost.
+function needsSsl(url) {
+  return /sslmode=require/i.test(url.search) || !/^(localhost|127\.0\.0\.1)$/.test(url.hostname)
 }
+
+// DATABASE_URL is the single source of truth when present — App Service (and
+// any managed hosting) only ever configures this one variable, not the five
+// discrete PG* vars. Fall back to PG* only for local setups that don't use a
+// connection string at all.
+function connectionConfigFrom(databaseUrl) {
+  if (!databaseUrl) {
+    return {
+      host: process.env.PGHOST || 'localhost',
+      port: Number(process.env.PGPORT || 5432),
+      user: process.env.PGUSER || undefined, // falls back to OS username
+      password: process.env.PGPASSWORD || undefined,
+    }
+  }
+  const url = new URL(databaseUrl)
+  return {
+    host: url.hostname,
+    port: Number(url.port || 5432),
+    user: url.username ? decodeURIComponent(url.username) : undefined,
+    password: url.password ? decodeURIComponent(url.password) : undefined,
+    ssl: needsSsl(url) ? { rejectUnauthorized: false } : undefined,
+  }
+}
+
+const baseConfig = connectionConfigFrom(process.env.DATABASE_URL)
 
 const DB_NAME = (() => {
   const url = process.env.DATABASE_URL
