@@ -10,7 +10,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:4000',
+        target: 'https://quizlab-api-am-cvg9bndpf2f0cxhj.centralindia-01.azurewebsites.net',
         changeOrigin: true,
       },
     },
