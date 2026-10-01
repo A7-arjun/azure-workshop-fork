@@ -57,14 +57,14 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_4F0FA1AB01174934913587B975AE429D }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_0D8EC66C921F4AD0BC1999A79984A24C }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_9AD8F470A3E44DF0932F6D5CFB0B3F7E }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_AD01AD2264AF46DAA5BB70ABEEBA83AB }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_004785210C2B435DA6C578768D875B93 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_089EE6CE146041A59B260B8BCDEC9B83 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'quizlab-api-am'
+          app-name: 'aditya-ws-web'
           slot-name: 'Production'
           package: .
